@@ -1,16 +1,24 @@
 const request = require('request');
-let input = require(`yargs`).argv;
-let query = `https://api.thecatapi.com/v1/breeds/search?q=${input._}`;
+// let input = require(`yargs`).argv;
 
-request(query, (error, response, body) => {
-  if (error) {
-    console.log('Sorry, there seems to be an error: \n', error);
-  }
-  const data = JSON.parse(body);
-  if (data[0]) {
-    console.log(data[0].description);
-  } else {
-    console.log(`Sorry, we cannot find any records of ${input._}.`);
-  }
+
+const fetchBreedDescription = (query, callback) => {
+  let queryURL = `https://api.thecatapi.com/v1/breeds/search?q=${query}`;
   
-});
+  request(queryURL, (error, response, body) => {
+    const data = JSON.parse(body);
+    if (error) {
+      callback(error, null);
+      return;
+    } else if (!data[0]) {
+      callback(null, "Cannot Find");
+      return;
+    } else {
+      callback(null, data[0].description);
+      return;
+    }
+  });
+
+};
+
+module.exports = { fetchBreedDescription };
